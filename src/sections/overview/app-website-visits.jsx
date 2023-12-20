@@ -23,7 +23,7 @@ export default function AppWebsiteVisits({ title, subheader, chart, ...other }) 
     },
     labels,
     xaxis: {
-      type: 'datetime',
+      type: 'string',
     },
     tooltip: {
       shared: true,

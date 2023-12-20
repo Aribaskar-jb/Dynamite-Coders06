@@ -5,8 +5,9 @@ import { useState, useEffect } from 'react';
 import Container from '@mui/material/Container';
 import Grid from '@mui/material/Unstable_Grid2';
 import Typography from '@mui/material/Typography';
-
+import Paper from '@mui/material/Paper';
 import Iconify from 'src/components/iconify';
+import PositionedSnackbar from "src/components/popup/popup"
 
 import AppTasks from '../app-tasks';
 import AppNewsUpdate from '../app-news-update';
@@ -25,7 +26,8 @@ export default function AppView() {
   const [waterTemperature, setWaterTemperature] = useState([]);
   const [timeDuration, setTimeDuration] = useState([]);
   const [seaCondition, setSeaCondition] = useState(0);
-  const [fuelConsumptionRate,setFuelConsumptionRate]=useState([])
+  const [fuelConsumptionRate, setFuelConsumptionRate] = useState([]);
+  const [predictionData, setPredictionData] = useState(null);
   async function fetchData() {
     // alert("E")
     try {
@@ -49,10 +51,51 @@ export default function AppView() {
 
     async function fetchDataAndUpdate() {
       const rowsData = await fetchData();
+
       if (rowsData) {
         let index = 0;
-        intervalId = setInterval(() => {
+        intervalId = setInterval(async () => {
           if (index < rowsData.length) {
+            const dataToSend = {
+              // Create your data object to send in the POST request
+              // For example:
+              sailingSpeed: parseInt(rowsData[index][1], 10), // parseInt(stringValue, 10) Assuming data is one of your state variables
+              draft: parseInt(rowsData[index][2], 10),
+              trim: parseInt(rowsData[index][3], 10),
+              windSpeed: parseInt(rowsData[index][11], 10),
+              windDirection: parseInt(rowsData[index][12], 10),
+              currentSpeed: parseInt(rowsData[index][13], 10),
+              currentDirection: parseInt(rowsData[index][14], 10),
+              combinedWaveHeight: parseInt(rowsData[index][15], 10),
+              combinedWaveDirection: parseInt(rowsData[index][16], 10),
+              combinedWavePeriod: 10,
+              seaWaterTemp: parseInt(rowsData[index][6], 10), // Another state variable
+              // Add other data variables as needed
+            };
+
+            fetch('https://maritime.LakshmiB1.repl.co/predict', {
+              method: 'POST',
+              headers: {
+                'Content-Type': 'application/json',
+              },
+              body: JSON.stringify(dataToSend),
+            })
+              .then((response) => {
+                if (response.ok) {
+                  return response.json();
+                  // Parse the response JSON
+                } else {
+                  throw new Error('Network response was not ok.');
+                }
+              })
+              .then((data) => {
+                console.log('Prediction result:', data);
+                setPredictionData(data); // Store the response data in state
+                // Use the 'data' received in the response as needed
+              })
+              .catch((error) => {
+                console.error('There was a problem with the fetch operation:', error);
+              });
             const sailingSpeed = parseFloat(rowsData[index][1]);
             setDraft((prevData) => [...prevData, rowsData[index][2]]);
             setWaterTemperature((prevData) => [...prevData, rowsData[index][6]]);
@@ -83,12 +126,12 @@ export default function AppView() {
     return () => clearInterval(intervalId); // Clear interval on component unmount
   }, []);
   useEffect(() => {
-    if (data.length === 11) {
+    if (data.length === 30) {
       setData([]);
       setDraft([]);
       setWaterTemperature([]);
       setTimeDuration([]);
-      setFuelConsumptionRate([])
+      setFuelConsumptionRate([]);
       // Set data to an empty array when its length reaches 10
     }
   }, [data, draft]);
@@ -97,9 +140,27 @@ export default function AppView() {
       <Typography variant="h4" sx={{ mb: 5 }}>
         Hi, Welcome back 👋
       </Typography>
-
+      <Paper elevation={3} sx={{ padding: 2, width: 'fit-content', marginBottom: '20px' }}>
+        {predictionData && (
+          <div>
+            <Typography variant="h6" gutterBottom>
+              Message Logs
+            </Typography>
+            <Typography variant="body1">
+              Most Contributing Feature: {predictionData.x.most_contributing_feature.replace(/([A-Z])/g, ' $1').toLowerCase().replace(/^./, str => str.toUpperCase())}
+            </Typography>
+            <Typography variant="body1">Prediction Value: {predictionData.x.prediction}</Typography>
+            {predictionData && predictionData.x.prediction > 63 && (
+              <Typography variant="body1">
+                <PositionedSnackbar msg={"High Fuel Consumption detected!! Please check " + predictionData.x.most_contributing_feature.replace(/([A-Z])/g, ' $1').charAt(0).toUpperCase() + predictionData.x.most_contributing_feature.slice(1)}/>
+              </Typography>
+            )}
+          </div>
+        )}
+      </Paper>
       <Grid container spacing={3}>
-        {/* <Grid xs={12} sm={6} md={3}>
+        {/*High Fuel Consumption detected!! Please check {Dominant Parameter} for reducing the fuel consumption Rate 
+        <Grid xs={12} sm={6} md={3}>
           <AppWidgetSummary
             title="Weekly Sales"
             total={714000}
@@ -137,21 +198,11 @@ export default function AppView() {
 
         <Grid xs={12} md={6} lg={8}>
           <AppWebsiteVisits
-            title="Website Visits"
-            subheader="(+43%) than last year"
+            title="Data Dashboard"
+            // subheader="(+43%) than last year"
             chart={{
               labels: [
-                '01/01/2003',
-                '02/01/2003',
-                '03/01/2003',
-                '04/01/2003',
-                '05/01/2003',
-                '06/01/2003',
-                '07/01/2003',
-                '08/01/2003',
-                '09/01/2003',
-                '10/01/2003',
-                '11/01/2003',
+                
               ],
               series: [
                 {
@@ -195,14 +246,14 @@ export default function AppView() {
         <Grid xs={12} md={6} lg={8}>
           <AppConversionRates
             title="Time Duration"
-            subheader="(+43%) than last year"
+            // subheader="(+43%) than last year"
             chart={{
               series: timeDuration,
             }}
           />
         </Grid>
 
-        <Grid xs={12} md={6} lg={4} >
+        <Grid xs={12} md={6} lg={4}>
           {/* <AppCurrentSubject
             title="Current Subject"
             chart={{
@@ -215,8 +266,8 @@ export default function AppView() {
             }}
           /> */}
           <AppWebsiteVisits
-            title="Website Visits"
-            subheader="(+43%) than last year"
+            // title="Website Visits"
+            // subheader="(+43%) than last year"
             chart={{
               labels: [
                 '01/01/2003',
@@ -236,9 +287,8 @@ export default function AppView() {
                   name: 'Sailing_Speed',
                   type: 'column',
                   fill: 'solid',
-                  data:fuelConsumptionRate,
+                  data: fuelConsumptionRate,
                 },
-                
               ],
             }}
           />
