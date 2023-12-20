@@ -140,7 +140,7 @@ export default function AppView() {
   return (
     <Container maxWidth="xl">
       <Typography variant="h4" sx={{ mb: 5 }}>
-        Hi, Welcome back 👋
+        Dashboard 👋
       </Typography>
       <div style={{ display: 'flex', display: 'flex', justifyContent: 'space-between',marginBottom:"50px" }}>
         <Paper elevation={3} sx={{ padding: 2, width: 'fit-content', marginBottom: '20px' }}>
@@ -171,6 +171,7 @@ export default function AppView() {
                       predictionData.x.most_contributing_feature.slice(1)
                     }
                     val={predictionData.x.prediction}
+                    contributing_feature={predictionData.x.most_contributing_feature}
                     data={logdata}
                     setdata={setLogData}
                   />

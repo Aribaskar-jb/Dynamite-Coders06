@@ -33,7 +33,7 @@ export default function PositionedSnackbar(props) {
     }
     props.setdata((prevLogData) => [
       ...prevLogData,
-      { contributing_featur: props.msg, prediction: props.val },
+      { contributing_featur: props.contributing_feature, prediction: props.val },
     ]);
     console.log(props.data);
   }, [props.msg, state.message]);

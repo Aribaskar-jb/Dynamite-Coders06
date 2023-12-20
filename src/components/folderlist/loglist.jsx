@@ -22,12 +22,25 @@ export default function PinnedSubheaderList(props) {
       {props.data.map((item, index) => (
         <li key={`item-${index}`}>
           <ul>
-            {index !== 0 && <ListSubheader>{`${item.contributing_featur}`}</ListSubheader>}
+          {index !== 0 && (
+              <ListSubheader>{`Complete Logs`}</ListSubheader>
+            )}
             {Object.keys(item).length > 0 && (
-              <ListItem>
-                <ListItemText primary={`Prediction: ${item.prediction}`} />
-                {/* <ListItemText primary={`contributing_feature: ${item.contributing_featur}`} /> */}
-              </ListItem>
+              <>
+                {' '}
+                <ListItem>
+                  <ListItemText primary={`Prediction: ${item.prediction}`} />
+                  {/* <ListItemText primary={`contributing_feature: ${item.contributing_featur}`} /> */}
+                </ListItem>
+                <ListItem>
+                  <ListItemText primary={`Contributing_Featur: ${item.contributing_featur}`} />
+                  {/* <ListItemText primary={`contributing_feature: ${item.contributing_featur}`} /> */}
+                </ListItem>
+                <ListItem>
+                  {/* ---------------------------------------------------- */}
+                  {/* <ListItemText primary={`contributing_feature: ${item.contributing_featur}`} /> */}
+                </ListItem>
+              </>
             )}
           </ul>
         </li>
