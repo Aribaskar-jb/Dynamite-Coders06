@@ -37,7 +37,7 @@ export default function AppCurrentVisits({ seaCondition, title, subheader, chart
   const { colors, series, options } = chart;
 
   return (
-    <Card {...other} sx={{ height: '100%' }}>
+    <Card {...other} sx={{ height: '95%'}}>
       <CardHeader title={title} subheader={subheader} sx={{ mb: 5 }} />
 
       {/* <StyledChart

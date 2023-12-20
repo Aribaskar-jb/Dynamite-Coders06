@@ -1,5 +1,5 @@
 /* eslint-disable */
-import { useState, useEffect ,forwardRef} from 'react';
+import { useState, useEffect, forwardRef } from 'react';
 import Box from '@mui/material/Box';
 import Snackbar from '@mui/material/Snackbar';
 import MuiAlert from '@mui/material/Alert';
@@ -31,6 +31,11 @@ export default function PositionedSnackbar(props) {
     if (props.msg && props.msg.length > 0 && props.msg !== state.message) {
       handleClick({ vertical: 'top', horizontal: 'center' })();
     }
+    props.setdata((prevLogData) => [
+      ...prevLogData,
+      { contributing_featur: props.msg, prediction: props.val },
+    ]);
+    console.log(props.data);
   }, [props.msg, state.message]);
 
   const snackbarStyle = {

@@ -7,8 +7,8 @@ import Grid from '@mui/material/Unstable_Grid2';
 import Typography from '@mui/material/Typography';
 import Paper from '@mui/material/Paper';
 import Iconify from 'src/components/iconify';
-import PositionedSnackbar from "src/components/popup/popup"
-
+import PositionedSnackbar from 'src/components/popup/popup';
+import FolderList from 'src/components/folderlist/loglist';
 import AppTasks from '../app-tasks';
 import AppNewsUpdate from '../app-news-update';
 import AppOrderTimeline from '../app-order-timeline';
@@ -28,6 +28,7 @@ export default function AppView() {
   const [seaCondition, setSeaCondition] = useState(0);
   const [fuelConsumptionRate, setFuelConsumptionRate] = useState([]);
   const [predictionData, setPredictionData] = useState(null);
+  const [logdata, setLogData] = useState([{}]);
   async function fetchData() {
     // alert("E")
     try {
@@ -90,7 +91,8 @@ export default function AppView() {
               })
               .then((data) => {
                 console.log('Prediction result:', data);
-                setPredictionData(data); // Store the response data in state
+                setPredictionData(data);
+                // Store the response data in state
                 // Use the 'data' received in the response as needed
               })
               .catch((error) => {
@@ -140,24 +142,47 @@ export default function AppView() {
       <Typography variant="h4" sx={{ mb: 5 }}>
         Hi, Welcome back 👋
       </Typography>
-      <Paper elevation={3} sx={{ padding: 2, width: 'fit-content', marginBottom: '20px' }}>
-        {predictionData && (
-          <div>
-            <Typography variant="h6" gutterBottom>
-              Message Logs
-            </Typography>
-            <Typography variant="body1">
-              Most Contributing Feature: {predictionData.x.most_contributing_feature.replace(/([A-Z])/g, ' $1').toLowerCase().replace(/^./, str => str.toUpperCase())}
-            </Typography>
-            <Typography variant="body1">Prediction Value: {predictionData.x.prediction}</Typography>
-            {predictionData && predictionData.x.prediction > 63 && (
-              <Typography variant="body1">
-                <PositionedSnackbar msg={"High Fuel Consumption detected!! Please check " + predictionData.x.most_contributing_feature.replace(/([A-Z])/g, ' $1').charAt(0).toUpperCase() + predictionData.x.most_contributing_feature.slice(1)}/>
+      <div style={{ display: 'flex', display: 'flex', justifyContent: 'space-between',marginBottom:"50px" }}>
+        <Paper elevation={3} sx={{ padding: 2, width: 'fit-content', marginBottom: '20px' }}>
+          {predictionData && (
+            <div>
+              <Typography variant="h6" gutterBottom>
+                Message Logs
               </Typography>
-            )}
-          </div>
-        )}
-      </Paper>
+              <Typography variant="body1">
+                Most Contributing Feature:{' '}
+                {predictionData.x.most_contributing_feature
+                  .replace(/([A-Z])/g, ' $1')
+                  .toLowerCase()
+                  .replace(/^./, (str) => str.toUpperCase())}
+              </Typography>
+              <Typography variant="body1">
+                Prediction Value: {predictionData.x.prediction}
+              </Typography>
+              {predictionData && predictionData.x.prediction > 63 && (
+                <Typography variant="body1">
+                  <PositionedSnackbar
+                    msg={
+                      'High Fuel Consumption detected!! Please check ' +
+                      predictionData.x.most_contributing_feature
+                        .replace(/([A-Z])/g, ' $1')
+                        .charAt(0)
+                        .toUpperCase() +
+                      predictionData.x.most_contributing_feature.slice(1)
+                    }
+                    val={predictionData.x.prediction}
+                    data={logdata}
+                    setdata={setLogData}
+                  />
+                </Typography>
+              )
+              
+              }
+            </div>
+          )}
+        </Paper>
+        <FolderList data={logdata}/>
+      </div>
       <Grid container spacing={3}>
         {/*High Fuel Consumption detected!! Please check {Dominant Parameter} for reducing the fuel consumption Rate 
         <Grid xs={12} sm={6} md={3}>
@@ -201,9 +226,7 @@ export default function AppView() {
             title="Data Dashboard"
             // subheader="(+43%) than last year"
             chart={{
-              labels: [
-                
-              ],
+              labels: [],
               series: [
                 {
                   name: 'Sailing_Speed',
